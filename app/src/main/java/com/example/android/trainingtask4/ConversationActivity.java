@@ -9,6 +9,8 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,9 +65,28 @@ public class ConversationActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
+        //      Camera Button
+        final ImageView camBtn = (ImageView) findViewById(R.id.cam_btn);
         final ImageView sendButton = (ImageView) findViewById(R.id.send_btn);
         final EditText editText = (EditText) findViewById(R.id.msg_text);
 
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                camBtn.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                camBtn.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(editText.getText().toString() == "")
+                camBtn.setVisibility(View.VISIBLE);
+            }
+        });
 
 //       mImageView = findViewById(R.id.mImageView);
 
@@ -95,17 +116,18 @@ public class ConversationActivity extends AppCompatActivity {
                     Message message = new Message(text, 0 , 0 );
                     messages.add(message);
 
+
 //                    clear editText
                     editText.setText("");
                     editText.getText().clear();
+                    hideSoftKeyboard(ConversationActivity.this);
 
                 }
             }
         });
 
 
-//      Camera Button
-        final ImageView camBtn = (ImageView) findViewById(R.id.cam_btn);
+
         camBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -178,6 +200,7 @@ public class ConversationActivity extends AppCompatActivity {
         ListView list = (ListView) findViewById(R.id.list);
         messageAdapter = new MessageAdapter(ConversationActivity.this, messages);
         list.setAdapter(messageAdapter);
+//        hideSoftKeyboard(this);
 
     }
 
