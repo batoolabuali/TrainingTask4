@@ -113,7 +113,7 @@ public class ConversationActivity extends AppCompatActivity {
 //                    message.setmMessageDate(DateUtils.formatDateTime(message.getCreatedAt());
                     Long time = System.currentTimeMillis();
                     String ts = formattingTime(time);
-                    Message message = new Message(text, 0 , 0 );
+                    Message message = new Message(text, 0 );
                     messages.add(message);
                     messageAdapter.notifyDataSetChanged();
 
@@ -268,7 +268,7 @@ public class ConversationActivity extends AppCompatActivity {
                 //add the function to perform here
                 for (Message msg : messages) {
                     if (msg.getMessageStatus() == Message.STATE_WAITING)
-                    msg.setMessageStatus(Message.STATE_SEND);
+                        msg.setMessageStatus(Message.STATE_SEND);
                 }
                 messageAdapter.notifyDataSetChanged();
                 break;
@@ -283,6 +283,12 @@ public class ConversationActivity extends AppCompatActivity {
                 break;
 //                return (true);
             case R.id.copy_msg:
+                if (!messages.isEmpty()) {
+                    Message lastMessage = messages.get(messages.size() - 1);
+                    lastMessage.setmMessageFrom(1);
+                    messages.add(lastMessage);
+                    messageAdapter.notifyDataSetChanged();
+                }
                 //add the function to perform here
 //                return (true);
         }
@@ -307,7 +313,7 @@ public class ConversationActivity extends AppCompatActivity {
 //            messages.add(message);
             Long time = System.currentTimeMillis();
             String ts = formattingTime(time);
-            Message message = new Message(mCurrentPhotoPath, 1 , 0 );
+            Message message = new Message(mCurrentPhotoPath, 1 );
             messages.add(message);
             messageAdapter.notifyDataSetChanged();
         }
@@ -324,7 +330,7 @@ public class ConversationActivity extends AppCompatActivity {
 //                    mVideoView.setVideoURI(videoUri);
                     Long time = System.currentTimeMillis();
                     String ts = formattingTime(time);
-                    Message message = new Message(mCurrentVideoPath, 2 , 0 );
+                    Message message = new Message(mCurrentVideoPath, 2 );
                     messages.add(message);
                     messageAdapter.notifyDataSetChanged();
                 }

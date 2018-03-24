@@ -12,11 +12,13 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -103,7 +105,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 //                }
 //            });
         } else {
-//            videoView.setVisibility(View.GONE);
+//            imageView.setVisibility(View.GONE);
         }
 
         ImageView imageViewMessageStatus = (ImageView) listItemView.findViewById(R.id.msg_status_img);
@@ -121,6 +123,13 @@ public class MessageAdapter extends ArrayAdapter<Message> {
                 imageViewMessageStatus.setImageResource(R.drawable.msg_status_client_read);
                 break;
         }
+
+//        اختبار المرسل، في حال كانت الرسالة ليست منك، نغير الخلفية للون الابيض و تموضع الرسالة على اليسار
+        if ( currentMessage.getmMessageFrom() == currentMessage.MESSAGE_FROM_FRIEND) {
+            listItemView.setBackgroundResource(R.drawable.balloon_outgoing_normal);
+            ((RelativeLayout) listItemView).setGravity(Gravity.LEFT);
+
+        }
         return listItemView;
     }
 
@@ -137,7 +146,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         // Determine how much to scale down the image
         int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-        
+
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;

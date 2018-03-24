@@ -12,7 +12,6 @@
     tools:context="com.example.android.trainingtask4.ConversationActivity"
     android:footerDividersEnabled="false"
     android:headerDividersEnabled="false"
-    android:background="@android:color/transparent"
 >
 
 </ListView>

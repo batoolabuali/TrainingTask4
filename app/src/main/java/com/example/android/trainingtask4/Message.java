@@ -15,7 +15,6 @@ public class Message {
 
 
     private int mMessageFrom = MESSAGE_FROM_ME;
-    private Boolean messageFromMe;
     public static final int MESSAGE_FROM_ME=0;
     public static final int MESSAGE_FROM_FRIEND=1;
 
@@ -25,13 +24,13 @@ public class Message {
     private int hasimage = NO_IMAGE_PROVIDED;
     private static final int NO_IMAGE_PROVIDED = -1;
 
-//    private int mMessageType ;
+    private int mMessageType ;
     public static final int MESSAGE_TEXT =  0;
     public static final int MESSAGE_IMAGE =  1;
     public static final int MESSAGE_VIDEO =  2;
 
 
-    public Message(String content, int type , int from ){
+    public Message(String content, int type  ){
         messageStatus = STATE_WAITING;
         if (type  == MESSAGE_TEXT)
         {
@@ -47,12 +46,6 @@ public class Message {
         }
 
         setmMessageTime(System.currentTimeMillis());
-
-        if(from == MESSAGE_FROM_ME)
-            messageFromMe = true;
-        else if ( from == MESSAGE_FROM_FRIEND){
-            messageFromMe = false ;
-        }
     }
 
 //    public Message(String messageText, String messageDate) {
@@ -126,13 +119,10 @@ public class Message {
         this.messageStatus = messageStatus;
     }
 
-//    public int getMessageType() {
-//        return mMessageType;
-//    }
-//
-//    public void setMessageType(int messageType) {
-//        this.mMessageType = messageType;
-//    }
+    public int getMessageType() {
+        return mMessageType;
+    }
+
 
     public Long getmMessageTime() {
         return mMessageTime;
@@ -140,5 +130,13 @@ public class Message {
 
     public void setmMessageTime(Long mMessageTime) {
         this.mMessageTime = mMessageTime;
+    }
+
+    public int getmMessageFrom() {
+        return mMessageFrom;
+    }
+
+    public void setmMessageFrom(int mMessageFrom) {
+        this.mMessageFrom = mMessageFrom;
     }
 }
