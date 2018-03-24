@@ -4,9 +4,15 @@
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="right"
+    android:divider="@null"
+    android:dividerHeight="0dp"
+    android:drawSelectorOnTop="true"
     android:orientation="vertical"
     tools:context="com.example.android.trainingtask4.ConversationActivity"
-    android:drawSelectorOnTop="true"
-    android:layout_gravity="right">
+    android:footerDividersEnabled="false"
+    android:headerDividersEnabled="false"
+    android:background="@android:color/transparent"
+>
 
 </ListView>

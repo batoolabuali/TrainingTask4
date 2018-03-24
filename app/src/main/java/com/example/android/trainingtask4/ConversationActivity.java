@@ -3,6 +3,8 @@ package com.example.android.trainingtask4;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -83,12 +85,10 @@ public class ConversationActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(editText.getText().toString() == "")
+                if(editText.getText().toString().equals("") )
                 camBtn.setVisibility(View.VISIBLE);
             }
         });
-
-//       mImageView = findViewById(R.id.mImageView);
 
 //        send message
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +115,7 @@ public class ConversationActivity extends AppCompatActivity {
                     String ts = formattingTime(time);
                     Message message = new Message(text, 0 , 0 );
                     messages.add(message);
+                    messageAdapter.notifyDataSetChanged();
 
 
 //                    clear editText
@@ -200,6 +201,10 @@ public class ConversationActivity extends AppCompatActivity {
         ListView list = (ListView) findViewById(R.id.list);
         messageAdapter = new MessageAdapter(ConversationActivity.this, messages);
         list.setAdapter(messageAdapter);
+        list.setDividerHeight(0);
+        list.setDivider(null);
+//        list.setFooterDividersEnabled(false);
+//        list.setOverscrollFooter(new ColorDrawable(Color.TRANSPARENT));
 //        hideSoftKeyboard(this);
 
     }
@@ -304,6 +309,7 @@ public class ConversationActivity extends AppCompatActivity {
             String ts = formattingTime(time);
             Message message = new Message(mCurrentPhotoPath, 1 , 0 );
             messages.add(message);
+            messageAdapter.notifyDataSetChanged();
         }
 
             case REQUEST_VIDEO_CAPTURE:
@@ -320,6 +326,7 @@ public class ConversationActivity extends AppCompatActivity {
                     String ts = formattingTime(time);
                     Message message = new Message(mCurrentVideoPath, 2 , 0 );
                     messages.add(message);
+                    messageAdapter.notifyDataSetChanged();
                 }
         }
     }

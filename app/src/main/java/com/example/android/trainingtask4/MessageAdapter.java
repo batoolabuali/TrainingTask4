@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -25,6 +27,8 @@ import java.util.ArrayList;
 public class MessageAdapter extends ArrayAdapter<Message> {
     Bitmap thumb;
     private static boolean messageFromMe = true;
+    int parentHeight;
+    int parentWidth;
 //    Button playBtn;
 
     public MessageAdapter(@NonNull Context context, @NonNull ArrayList<Message> objects) {
@@ -38,12 +42,15 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.message_fromme_item, parent, false);
         }
+
         final Message currentMessage = getItem(position);
         TextView textViewMessage = (TextView) listItemView.findViewById(R.id.message_text);
         textViewMessage.setText(currentMessage.getMessageText());
         TextView messageTime = (TextView) listItemView.findViewById(R.id.message_time);
         messageTime.setText(formattingTime(currentMessage.getmMessageTime()));
         ImageView imageView = (ImageView) listItemView.findViewById(R.id.img);
+        parentHeight = parent.getHeight();
+        parentWidth = parent.getWidth();
 //        final VideoView videoView = (VideoView) listItemView.findViewById(R.id.mVideoView);
 //        playBtn = (Button) listItemView.findViewById(R.id.play_button);
 //        Log.v("Path == ", currentMessage.getImagePath());
@@ -64,7 +71,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (currentMessage.hasVideo()) {
             imageView.setVisibility(View.VISIBLE);
             thumb = ThumbnailUtils.createVideoThumbnail(currentMessage.getVideoPath(), MediaStore.Images.Thumbnails.MINI_KIND);
-            Bitmap thumbBitmap = ThumbnailUtils.extractThumbnail(thumb, 150, 300,  ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+            Bitmap thumbBitmap = ThumbnailUtils.extractThumbnail(thumb, parent.getWidth()/2, parent.getHeight()/2,  ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
             imageView.setImageBitmap(thumbBitmap);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -125,11 +132,11 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
 
-//        int targetW = photoW/2;
-//        int targetH = photoH/2;
+     int targetW = parentWidth/2;
+        int targetH = parentHeight/2;
 
         // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / 150, photoH / 300);
+        int scaleFactor = Math.min( photoW / targetW, photoH / targetH );
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
