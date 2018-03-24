@@ -60,7 +60,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    openImage(getContext(),currentMessage.getImagePath());
+                    openImage(getContext(), currentMessage.getImagePath());
                 }
             });
         } else {
@@ -71,7 +71,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (currentMessage.hasVideo()) {
             imageView.setVisibility(View.VISIBLE);
             thumb = ThumbnailUtils.createVideoThumbnail(currentMessage.getVideoPath(), MediaStore.Images.Thumbnails.MINI_KIND);
-            Bitmap thumbBitmap = ThumbnailUtils.extractThumbnail(thumb, parent.getWidth()/2, parent.getHeight()/2,  ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+            Bitmap thumbBitmap = ThumbnailUtils.extractThumbnail(thumb, parentWidth / 2, parentHeight / 2, ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
             imageView.setImageBitmap(thumbBitmap);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -102,7 +102,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 //                    videoView.start();
 //                }
 //            });
-            } else {
+        } else {
 //            videoView.setVisibility(View.GONE);
         }
 
@@ -132,12 +132,12 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
 
-     int targetW = parentWidth/2;
-        int targetH = parentHeight/2;
+        int targetW = parentWidth / 2;
+        int targetH = parentHeight / 2;
 
         // Determine how much to scale down the image
-        int scaleFactor = Math.min( photoW / targetW, photoH / targetH );
-
+        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+        
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
@@ -167,14 +167,14 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 //        videoView.start();
     }
 
-    private static void openImage(Context context, String path){
-        Intent intent =new Intent(context,ImageViewerActivity.class);
+    private static void openImage(Context context, String path) {
+        Intent intent = new Intent(context, ImageViewerActivity.class);
         intent.putExtra("ImagePath", path);
         context.startActivity(intent);
     }
 
-    private static void openVideo(Context context, String path){
-        Intent intent =new Intent(context,VideoViewerActivity.class);
+    private static void openVideo(Context context, String path) {
+        Intent intent = new Intent(context, VideoViewerActivity.class);
         intent.putExtra("videoPath", path);
         context.startActivity(intent);
     }
@@ -189,7 +189,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         return timeString;
     }
-
 
 
 //    private static void openVideo(Context context, String path){
