@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -41,11 +42,43 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View listItemView = convertView;
+        final Message currentMessage = getItem(position);
+        int from = currentMessage.getmMessageFrom();
+
         if (listItemView == null) {
-            listItemView = LayoutInflater.from(getContext()).inflate(R.layout.message_fromme_item, parent, false);
+//            listItemView = LayoutInflater.from(getContext()).inflate(R.layout.message_fromme_item, parent, false);
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            //        اختبار المرسل، في حال كانت الرسالة ليست منك، نغير الخلفية للون الابيض و تموضع الرسالة على اليسار
+            if (from == currentMessage.MESSAGE_FROM_ME) {
+                listItemView = inflater.inflate(
+                        R.layout.message_fromme_item, parent, false);
+//            ((RelativeLayout) listItemView).setGravity(Gravity.RIGHT);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+              params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+//                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                listItemView.setLayoutParams(params);
+            } else if (from == currentMessage.MESSAGE_FROM_FRIEND) {
+
+                listItemView = inflater.inflate(
+                        R.layout.message_fromfriend_item, parent, false);
+                ((RelativeLayout) listItemView).setGravity(Gravity.LEFT);
+            }
+
         }
 
-        final Message currentMessage = getItem(position);
+
+        //        اختبار المرسل، في حال كانت الرسالة ليست منك، نغير الخلفية للون الابيض و تموضع الرسالة على اليسار
+//        if ( from == currentMessage.MESSAGE_FROM_FRIEND) {
+//            listItemView.setBackgroundResource(R.drawable.balloon_outgoing_normal);
+//            ((RelativeLayout) listItemView).setGravity(Gravity.LEFT);
+//
+//        }
+//        else
+//        {
+//            listItemView.setBackgroundResource(R.drawable.balloon_incoming_normal);
+//            ((RelativeLayout) listItemView).setGravity(Gravity.RIGHT);
+//        }
         TextView textViewMessage = (TextView) listItemView.findViewById(R.id.message_text);
         textViewMessage.setText(currentMessage.getMessageText());
         TextView messageTime = (TextView) listItemView.findViewById(R.id.message_time);
@@ -124,12 +157,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
                 break;
         }
 
-//        اختبار المرسل، في حال كانت الرسالة ليست منك، نغير الخلفية للون الابيض و تموضع الرسالة على اليسار
-        if ( currentMessage.getmMessageFrom() == currentMessage.MESSAGE_FROM_FRIEND) {
-            listItemView.setBackgroundResource(R.drawable.balloon_outgoing_normal);
-            ((RelativeLayout) listItemView).setGravity(Gravity.LEFT);
 
-        }
         return listItemView;
     }
 

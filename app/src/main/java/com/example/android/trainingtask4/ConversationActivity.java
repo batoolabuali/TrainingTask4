@@ -2,9 +2,12 @@ package com.example.android.trainingtask4;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -36,6 +39,32 @@ import java.util.Date;
 @SuppressWarnings("unused")
 public class ConversationActivity extends AppCompatActivity {
 
+    private AudioManager mAudioManager;
+    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
+            new AudioManager.OnAudioFocusChangeListener() {
+                @Override
+                public void onAudioFocusChange(int i) {
+                    if (i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
+                            i == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                        mMediaPlayer.pause();
+                        mMediaPlayer.seekTo(0);
+                    } else if (i == AudioManager.AUDIOFOCUS_GAIN) {
+                        mMediaPlayer.start();
+
+                    } else if (i == AudioManager.AUDIOFOCUS_LOSS) {
+                        releaseMediaPlayer();
+                    }
+                }
+            };
+
+    private MediaPlayer.OnCompletionListener mCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            releaseMediaPlayer();
+        }
+    };
+    private MediaPlayer mMediaPlayer;
+
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_VIDEO_CAPTURE = 2;
     private static final int RESULT_VEDIO_CAPTURE = 1;
@@ -55,6 +84,8 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
+
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         //hide the Soft Keyboard after touch any view another editText
         setupUI(findViewById(R.id.parentLayout));
@@ -113,10 +144,17 @@ public class ConversationActivity extends AppCompatActivity {
 //                    message.setmMessageDate(DateUtils.formatDateTime(message.getCreatedAt());
                     Long time = System.currentTimeMillis();
                     String ts = formattingTime(time);
-                    Message message = new Message(text, 0 );
+                    Message message = new Message(text, 0 , R.raw.send_tone);
                     messages.add(message);
-                    messageAdapter.notifyDataSetChanged();
+                    releaseMediaPlayer();
+                    int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
 
+                        mMediaPlayer = MediaPlayer.create(ConversationActivity.this, message.getmAudioResourceId());
+                        mMediaPlayer.start();
+                        mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                    }
+                    messageAdapter.notifyDataSetChanged();
 
 //                    clear editText
                     editText.setText("");
@@ -286,7 +324,16 @@ public class ConversationActivity extends AppCompatActivity {
                 if (!messages.isEmpty()) {
                     Message lastMessage = messages.get(messages.size() - 1);
                     lastMessage.setmMessageFrom(1);
+                    lastMessage.setMessageAudio(R.raw.recieve_tone);
                     messages.add(lastMessage);
+                    releaseMediaPlayer();
+                    int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+
+                        mMediaPlayer = MediaPlayer.create(ConversationActivity.this, lastMessage.getmAudioResourceId());
+                        mMediaPlayer.start();
+                        mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                    }
                     messageAdapter.notifyDataSetChanged();
                 }
                 //add the function to perform here
@@ -313,8 +360,16 @@ public class ConversationActivity extends AppCompatActivity {
 //            messages.add(message);
             Long time = System.currentTimeMillis();
             String ts = formattingTime(time);
-            Message message = new Message(mCurrentPhotoPath, 1 );
+            Message message = new Message(mCurrentPhotoPath, 1, R.raw.send_tone );
             messages.add(message);
+            releaseMediaPlayer();
+            int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+
+                mMediaPlayer = MediaPlayer.create(ConversationActivity.this, message.getmAudioResourceId());
+                mMediaPlayer.start();
+                mMediaPlayer.setOnCompletionListener(mCompletionListener);
+            }
             messageAdapter.notifyDataSetChanged();
         }
 
@@ -330,8 +385,16 @@ public class ConversationActivity extends AppCompatActivity {
 //                    mVideoView.setVideoURI(videoUri);
                     Long time = System.currentTimeMillis();
                     String ts = formattingTime(time);
-                    Message message = new Message(mCurrentVideoPath, 2 );
+                    Message message = new Message(mCurrentVideoPath, 2 , R.raw.send_tone);
                     messages.add(message);
+                    releaseMediaPlayer();
+                    int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+
+                        mMediaPlayer = MediaPlayer.create(ConversationActivity.this, message.getmAudioResourceId());
+                        mMediaPlayer.start();
+                        mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                    }
                     messageAdapter.notifyDataSetChanged();
                 }
         }
@@ -376,6 +439,21 @@ public class ConversationActivity extends AppCompatActivity {
                 View innerView = ((ViewGroup) view).getChildAt(i);
                 setupUI(innerView);
             }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        releaseMediaPlayer();
+    }
+
+    private void releaseMediaPlayer() {
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+            mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
         }
     }
 }

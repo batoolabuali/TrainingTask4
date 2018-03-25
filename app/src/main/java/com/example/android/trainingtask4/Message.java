@@ -12,6 +12,7 @@ public class Message {
     private String mImagePath;
     private String mVideoPath;
     private Long mMessageTime;
+    private int mAudioResourceId;
 
 
     private int mMessageFrom = MESSAGE_FROM_ME;
@@ -30,8 +31,9 @@ public class Message {
     public static final int MESSAGE_VIDEO =  2;
 
 
-    public Message(String content, int type  ){
+    public Message(String content, int type , int audioResourceId ){
         messageStatus = STATE_WAITING;
+        mAudioResourceId = audioResourceId;
         if (type  == MESSAGE_TEXT)
         {
             mMessageText = content;
@@ -119,10 +121,6 @@ public class Message {
         this.messageStatus = messageStatus;
     }
 
-    public int getMessageType() {
-        return mMessageType;
-    }
-
 
     public Long getmMessageTime() {
         return mMessageTime;
@@ -138,5 +136,11 @@ public class Message {
 
     public void setmMessageFrom(int mMessageFrom) {
         this.mMessageFrom = mMessageFrom;
+    }
+
+    public  int getmAudioResourceId(){return mAudioResourceId;}
+
+    public void setMessageAudio(int id ){
+        mAudioResourceId = id ;
     }
 }
