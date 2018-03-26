@@ -17,12 +17,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -32,7 +35,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private static boolean messageFromMe = true;
     int parentHeight;
     int parentWidth;
-//    Button playBtn;
+    Button playBtn;
 
     public MessageAdapter(@NonNull Context context, @NonNull ArrayList<Message> objects) {
         super(context, 0, objects);
@@ -53,45 +56,33 @@ public class MessageAdapter extends ArrayAdapter<Message> {
             if (from == currentMessage.MESSAGE_FROM_ME) {
                 listItemView = inflater.inflate(
                         R.layout.message_fromme_item, parent, false);
-//            ((RelativeLayout) listItemView).setGravity(Gravity.RIGHT);
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-              params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-//                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                listItemView.setLayoutParams(params);
             } else if (from == currentMessage.MESSAGE_FROM_FRIEND) {
 
                 listItemView = inflater.inflate(
                         R.layout.message_fromfriend_item, parent, false);
-                ((RelativeLayout) listItemView).setGravity(Gravity.LEFT);
             }
 
         }
-
-
-        //        اختبار المرسل، في حال كانت الرسالة ليست منك، نغير الخلفية للون الابيض و تموضع الرسالة على اليسار
-//        if ( from == currentMessage.MESSAGE_FROM_FRIEND) {
-//            listItemView.setBackgroundResource(R.drawable.balloon_outgoing_normal);
-//            ((RelativeLayout) listItemView).setGravity(Gravity.LEFT);
-//
-//        }
-//        else
-//        {
-//            listItemView.setBackgroundResource(R.drawable.balloon_incoming_normal);
-//            ((RelativeLayout) listItemView).setGravity(Gravity.RIGHT);
-//        }
+        
         TextView textViewMessage = (TextView) listItemView.findViewById(R.id.message_text);
         textViewMessage.setText(currentMessage.getMessageText());
         TextView messageTime = (TextView) listItemView.findViewById(R.id.message_time);
         messageTime.setText(formattingTime(currentMessage.getmMessageTime()));
+
         ImageView imageView = (ImageView) listItemView.findViewById(R.id.img);
         parentHeight = parent.getHeight();
         parentWidth = parent.getWidth();
-//        final VideoView videoView = (VideoView) listItemView.findViewById(R.id.mVideoView);
-//        playBtn = (Button) listItemView.findViewById(R.id.play_button);
+        playBtn = (Button) listItemView.findViewById(R.id.play_button);
 //        Log.v("Path == ", currentMessage.getImagePath());
         if (currentMessage.hasImage()) {
-            imageView.setVisibility(View.VISIBLE);
-            setPic(imageView, currentMessage.getImagePath());
+
+//            imageView.setVisibility(View.VISIBLE);
+//            setPic(imageView, currentMessage.getImagePath());
+//            thumb = ThumbnailUtils.createVideoThumbnail(currentMessage.getImagePath(), MediaStore.Images.Thumbnails.MINI_KIND);
+//            Bitmap thumbBitmap = ThumbnailUtils.extractThumbnail(thumb, parentWidth / 2, parentHeight / 2, ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+//            Uri uri = Uri.fromFile(new File(currentMessage.getImagePath()));
+            Bitmap resized = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentMessage.getImagePath()), parentWidth/2, parentHeight/2);
+            imageView.setImageBitmap(resized);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -99,12 +90,13 @@ public class MessageAdapter extends ArrayAdapter<Message> {
                 }
             });
         } else {
-            imageView.setVisibility(View.GONE);
+
         }
 //String p = currentMessage.getVideoPath();
 //        Log.v("Path====", p);
         if (currentMessage.hasVideo()) {
             imageView.setVisibility(View.VISIBLE);
+            playBtn.setVisibility(View.VISIBLE);
             thumb = ThumbnailUtils.createVideoThumbnail(currentMessage.getVideoPath(), MediaStore.Images.Thumbnails.MINI_KIND);
             Bitmap thumbBitmap = ThumbnailUtils.extractThumbnail(thumb, parentWidth / 2, parentHeight / 2, ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
             imageView.setImageBitmap(thumbBitmap);
@@ -161,48 +153,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         return listItemView;
     }
 
-    private void setPic(ImageView imageView, String photoPath) {
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(photoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        int targetW = parentWidth / 2;
-        int targetH = parentHeight / 2;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);
-        imageView.setImageBitmap(bitmap);
-    }
-
-
-    private void setVideo(VideoView videoView, String videoPath) {
-//        videoView.setVideoPath(videoPath);
-//        videoView.setVideoURI(Uri.parse(Environment.getExternalStorageDirectory()+videoPath));
-
-        //Create MediaController
-        videoView.setVideoURI(Uri.parse(videoPath));
-//        videoView.requestFocus();
-//        videoView.start();
-//            playBtn.setVisibility(View.VISIBLE);
-//            playBtn.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    videoView.start();
-//                }
-//            });
-
-//        videoView.start();
-    }
 
     private static void openImage(Context context, String path) {
         Intent intent = new Intent(context, ImageViewerActivity.class);
@@ -227,10 +177,4 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         return timeString;
     }
 
-
-//    private static void openVideo(Context context, String path){
-//        Intent intent =new Intent(context,VideoViewerActivity.class);
-//        intent.putExtra("videoPath", path);
-//        context.startActivity(intent);
-//    }
 }

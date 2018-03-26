@@ -1,75 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="right"
-    android:layout_gravity="right"
-    android:layout_margin="8dp"
-    android:background="@drawable/balloon_outgoing_normal">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/img"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_margin="8dp"
-        android:scaleType="centerCrop"
-        android:visibility="gone"/>
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/balloon_outgoing_normal">
 
-    <!--<FrameLayout-->
-        <!--android:id="@+id/video_frame"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:layout_margin="8dp">-->
 
-        <!--<VideoView-->
-            <!--android:visibility="gone"-->
-            <!--android:layout_below="@id/img"-->
-            <!--android:id="@+id/mVideoView"-->
-            <!--android:layout_width="200dp"-->
-            <!--android:layout_height="250dp"-->
-            <!--android:layout_margin="8dp" />-->
+        <FrameLayout
+            android:id="@+id/frame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        <!--<ImageButton-->
-            <!--android:id="@+id/play_button"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_vertical|center_horizontal"-->
-            <!--android:src="@drawable/mviewer_play"-->
-            <!--android:visibility="gone" />-->
-    <!--</FrameLayout>-->
+            <ImageView
+                android:id="@+id/img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop" />
 
-    <TextView
-        android:id="@+id/message_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/img"
-        android:layout_marginLeft="16dp"
-        android:textAppearance="?android:textAppearanceMedium"
-        android:textColor="@android:color/black"
-        android:textStyle="bold"
-        tools:text="hey" />
+            <ImageButton
+                android:id="@+id/play_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/mviewer_play"
+                android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/message_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/message_text"
-        android:layout_marginLeft="16dp"
-        android:textAppearance="?android:textAppearanceMedium"
-        android:textColor="@android:color/black"
-        android:textSize="10sp"
-        tools:text="7 seconds ago, 7:00 AM" />
+        </FrameLayout>
 
-    <ImageView
-        android:id="@+id/msg_status_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/message_text"
-        android:layout_marginLeft="8dp"
-        android:layout_toRightOf="@id/message_time"
-        android:src="@drawable/msg_status_gray_waiting" />
+        <TextView
+            android:id="@+id/message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/frame"
+            android:layout_marginStart="16dp"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            tools:text="hey" />
 
+        <TextView
+            android:id="@+id/message_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/message_text"
+            android:layout_marginStart="16dp"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:textSize="10sp"
+            tools:text="7 seconds ago, 7:00 AM" />
+
+        <ImageView
+            android:id="@+id/msg_status_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/message_text"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/message_time"
+            android:src="@drawable/msg_status_gray_waiting" />
+
+    </RelativeLayout>
 </RelativeLayout>

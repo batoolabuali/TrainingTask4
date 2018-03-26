@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Training Task4</string>
+    <string name="online">online</string>
+    <string name="enter_your_message">Enter Your Message</string>
 </resources>

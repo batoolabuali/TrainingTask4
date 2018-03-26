@@ -28,7 +28,7 @@
                 android:id="@+id/btn1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:src="@drawable/back_arrow" />
 
@@ -36,7 +36,7 @@
                 android:id="@+id/btn2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/btn1"
+                android:layout_toEndOf="@id/btn1"
                 android:src="@drawable/avatar_contact" />
 
             <TextView
@@ -44,8 +44,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/btn2"
-                android:layout_marginLeft="8dp"
-                android:layout_toRightOf="@id/btn2"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/btn2"
                 android:text="Omar"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
@@ -55,9 +55,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/txt1"
-                android:layout_marginLeft="8dp"
-                android:layout_toRightOf="@id/btn2"
-                android:text="online"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/btn2"
+                android:text="@string/online"
                 android:textColor="@android:color/white"
                 android:textSize="8sp" />
         </RelativeLayout>
@@ -87,8 +87,8 @@
         android:layout_height="48dp"
         android:layout_weight="0"
         android:minHeight="48dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         android:orientation="horizontal">
         <LinearLayout
             android:layout_width="match_parent"
@@ -98,7 +98,7 @@
             android:background="@drawable/edittext_bg"
             android:orientation="horizontal">
         <ImageView
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
@@ -106,11 +106,11 @@
             android:src="@drawable/input_emoji"/>
 
         <EditText
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:id="@+id/msg_text"
             android:maxLines="6"
             android:layout_width="0dp"
-            android:hint="Enter Your Message"
+            android:hint="@string/enter_your_message"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="text"
@@ -122,8 +122,8 @@
             android:layout_weight="0"
             android:layout_gravity="center"
             android:src="@drawable/input_cam"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"/>
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"/>
         </LinearLayout>
         <ImageView
             android:id="@+id/send_btn"
@@ -133,8 +133,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/input_send"
             android:background="@drawable/input_circle_normal"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"/>
+            android:scaleType="centerInside"/>
 
     </LinearLayout>
 

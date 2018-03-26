@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
@@ -34,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 
 @SuppressWarnings("unused")
@@ -132,16 +135,6 @@ public class ConversationActivity extends AppCompatActivity {
                         Toast.makeText(ConversationActivity.this, "Make Sure to enter a text!", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
-//                    Calendar rightNow = Calendar.getInstance();
-//                    int currentHour = rightNow.get(Calendar.HOUR_OF_DAY);
-//                    int minute = rightNow.get(Calendar.MINUTE);
-//                    Date currentTime = Calendar.getInstance().getTime();
-//                    String ts = tsLong.toString() + " seconds ago, ";
-//                    String ts = currentTime.toString();
-//                    String ts = String.valueOf(currentHour) + ":" + String.valueOf(minute);
-//                    Message message = new Message(text, ts);
-//                    message.setmMessageDate(DateUtils.formatDateTime(message.getCreatedAt());
                     Long time = System.currentTimeMillis();
                     String ts = formattingTime(time);
                     Message message = new Message(text, 0 , R.raw.send_tone);
@@ -227,8 +220,6 @@ public class ConversationActivity extends AppCompatActivity {
                                 takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoURI);
                                 startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
                             }
-
-
                         }
                         dialog.dismiss();
                     }
@@ -241,10 +232,6 @@ public class ConversationActivity extends AppCompatActivity {
         list.setAdapter(messageAdapter);
         list.setDividerHeight(0);
         list.setDivider(null);
-//        list.setFooterDividersEnabled(false);
-//        list.setOverscrollFooter(new ColorDrawable(Color.TRANSPARENT));
-//        hideSoftKeyboard(this);
-
     }
 
 
@@ -277,19 +264,7 @@ public class ConversationActivity extends AppCompatActivity {
                 storageDir      /* directory */
         );
         mCurrentVideoPath = video.getAbsolutePath();
-//        this.videoUri = Uri.fromFile( video );
-//        Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE );
-//        mediaScanIntent.setData( this.videoUri );
-//        this.sendBroadcast( mediaScanIntent );
         return video;
-    }
-
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
     }
 
     @Override
@@ -349,15 +324,6 @@ public class ConversationActivity extends AppCompatActivity {
 
             case REQUEST_IMAGE_CAPTURE:
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-
-//            setPic(mImageView, mCurrentPhotoPath);
-//            galleryAddPic();
-//            Calendar rightNow = Calendar.getInstance();
-//            int currentHour = rightNow.get(Calendar.HOUR_OF_DAY);
-//            int minute = rightNow.get(Calendar.MINUTE);
-//            String ts = String.valueOf(currentHour) + ":" + String.valueOf(minute);
-//            Message message = new Message("", ts, mCurrentPhotoPath);
-//            messages.add(message);
             Long time = System.currentTimeMillis();
             String ts = formattingTime(time);
             Message message = new Message(mCurrentPhotoPath, 1, R.raw.send_tone );
@@ -365,7 +331,6 @@ public class ConversationActivity extends AppCompatActivity {
             releaseMediaPlayer();
             int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-
                 mMediaPlayer = MediaPlayer.create(ConversationActivity.this, message.getmAudioResourceId());
                 mMediaPlayer.start();
                 mMediaPlayer.setOnCompletionListener(mCompletionListener);
@@ -375,14 +340,6 @@ public class ConversationActivity extends AppCompatActivity {
 
             case REQUEST_VIDEO_CAPTURE:
                 if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-//                    Calendar rightNow = Calendar.getInstance();
-//                    int currentHour = rightNow.get(Calendar.HOUR_OF_DAY);
-//                    int minute = rightNow.get(Calendar.MINUTE);
-//                    String ts = String.valueOf(currentHour) + ":" + String.valueOf(minute);
-//                    Message message = new Message("", ts, "",  mCurrentVideoPath);
-//                    messages.add(message);
-//                    Uri videoUri = data.getData();
-//                    mVideoView.setVideoURI(videoUri);
                     Long time = System.currentTimeMillis();
                     String ts = formattingTime(time);
                     Message message = new Message(mCurrentVideoPath, 2 , R.raw.send_tone);
@@ -456,4 +413,5 @@ public class ConversationActivity extends AppCompatActivity {
             mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
         }
     }
+
 }
