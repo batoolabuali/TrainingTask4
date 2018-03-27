@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -19,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -26,30 +29,56 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 
 public class MessageAdapter extends ArrayAdapter<Message> {
     Bitmap thumb;
-    private static boolean messageFromMe = true;
     int parentHeight;
     int parentWidth;
-    Button playBtn;
+    ImageButton playBtn;
+    Message currentMessage;
+    Bitmap resized;
 
     public MessageAdapter(@NonNull Context context, @NonNull ArrayList<Message> objects) {
         super(context, 0, objects);
+    }
+
+    // When clicking on image, open the full size in another activity
+    private static void openImage(Context context, String path) {
+        Intent intent = new Intent(context, ImageViewerActivity.class);
+        intent.putExtra("ImagePath", path);
+        context.startActivity(intent);
+    }
+
+    // When clicking on play Button on video, play the full size video in another activity
+    private static void openVideo(Context context, String path) {
+        Intent intent = new Intent(context, VideoViewerActivity.class);
+        intent.putExtra("videoPath", path);
+        context.startActivity(intent);
+    }
+
+    // formatting time message chat
+    public static String formattingTime(long time) {
+
+        long now = System.currentTimeMillis();
+        CharSequence ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.FORMAT_SHOW_TIME);
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm aa");
+        String timeString = ago + "  " + format.format(time) + " ";
+
+        return timeString;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View listItemView = convertView;
-        final Message currentMessage = getItem(position);
+        currentMessage = getItem(position);
         int from = currentMessage.getmMessageFrom();
 
         if (listItemView == null) {
-//            listItemView = LayoutInflater.from(getContext()).inflate(R.layout.message_fromme_item, parent, false);
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             //        اختبار المرسل، في حال كانت الرسالة ليست منك، نغير الخلفية للون الابيض و تموضع الرسالة على اليسار
@@ -63,7 +92,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
             }
 
         }
-        
+
         TextView textViewMessage = (TextView) listItemView.findViewById(R.id.message_text);
         textViewMessage.setText(currentMessage.getMessageText());
         TextView messageTime = (TextView) listItemView.findViewById(R.id.message_time);
@@ -72,16 +101,10 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         ImageView imageView = (ImageView) listItemView.findViewById(R.id.img);
         parentHeight = parent.getHeight();
         parentWidth = parent.getWidth();
-        playBtn = (Button) listItemView.findViewById(R.id.play_button);
-//        Log.v("Path == ", currentMessage.getImagePath());
+        playBtn = (ImageButton) listItemView.findViewById(R.id.play_button);
         if (currentMessage.hasImage()) {
-
-//            imageView.setVisibility(View.VISIBLE);
-//            setPic(imageView, currentMessage.getImagePath());
-//            thumb = ThumbnailUtils.createVideoThumbnail(currentMessage.getImagePath(), MediaStore.Images.Thumbnails.MINI_KIND);
-//            Bitmap thumbBitmap = ThumbnailUtils.extractThumbnail(thumb, parentWidth / 2, parentHeight / 2, ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
-//            Uri uri = Uri.fromFile(new File(currentMessage.getImagePath()));
-            Bitmap resized = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentMessage.getImagePath()), parentWidth/2, parentHeight/2);
+            resized = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(currentMessage.getImagePath()), parentWidth / 2, parentHeight / 2);
+            correctRotation();
             imageView.setImageBitmap(resized);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -89,48 +112,20 @@ public class MessageAdapter extends ArrayAdapter<Message> {
                     openImage(getContext(), currentMessage.getImagePath());
                 }
             });
-        } else {
-
         }
-//String p = currentMessage.getVideoPath();
-//        Log.v("Path====", p);
+
         if (currentMessage.hasVideo()) {
-            imageView.setVisibility(View.VISIBLE);
             playBtn.setVisibility(View.VISIBLE);
             thumb = ThumbnailUtils.createVideoThumbnail(currentMessage.getVideoPath(), MediaStore.Images.Thumbnails.MINI_KIND);
             Bitmap thumbBitmap = ThumbnailUtils.extractThumbnail(thumb, parentWidth / 2, parentHeight / 2, ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
             imageView.setImageBitmap(thumbBitmap);
-            imageView.setOnClickListener(new View.OnClickListener() {
+            playBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     openVideo(getContext(), currentMessage.getVideoPath());
 
                 }
             });
-
-//            MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-//            mediaMetadataRetriever .setDataSource(currentMessage.getVideoPath());
-//            Bitmap bmFrame = mediaMetadataRetriever.getFrameAtTime(1000); //unit in microsecond
-//            imageView.setImageBitmap(bmFrame);
-
-//            videoView.setVisibility(View.VISIBLE);
-//            setVideo(videoView, currentMessage.getVideoPath());
-//            videoView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    openVideo(getContext(), currentMessage.getVideoPath());
-//                }
-//            });
-
-//            playBtn.setVisibility(View.VISIBLE);
-//            playBtn.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    videoView.start();
-//                }
-//            });
-        } else {
-//            imageView.setVisibility(View.GONE);
         }
 
         ImageView imageViewMessageStatus = (ImageView) listItemView.findViewById(R.id.msg_status_img);
@@ -153,28 +148,31 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         return listItemView;
     }
 
-
-    private static void openImage(Context context, String path) {
-        Intent intent = new Intent(context, ImageViewerActivity.class);
-        intent.putExtra("ImagePath", path);
-        context.startActivity(intent);
-    }
-
-    private static void openVideo(Context context, String path) {
-        Intent intent = new Intent(context, VideoViewerActivity.class);
-        intent.putExtra("videoPath", path);
-        context.startActivity(intent);
-    }
-
-    // formatting time message chat
-    public static String formattingTime(long time) {
-
-        long now = System.currentTimeMillis();
-        CharSequence ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.FORMAT_SHOW_TIME);
-        SimpleDateFormat format = new SimpleDateFormat("hh:mm aa");
-        String timeString = ago + "  " + format.format(time) + " ";
-
-        return timeString;
+    //    Solve rotation problem on some devices
+    public void correctRotation() {
+        try {
+            int rotationInDegrees = 0;
+            ExifInterface exif = new ExifInterface(currentMessage.getImagePath());
+            int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            switch (exifOrientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotationInDegrees = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotationInDegrees = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotationInDegrees = 270;
+                    break;
+            }
+            if (rotationInDegrees != 0) {
+                Matrix matrix = new Matrix();
+                matrix.preRotate(rotationInDegrees);
+                resized = Bitmap.createBitmap(resized, 0, 0, resized.getWidth(), resized.getHeight(), matrix, true);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

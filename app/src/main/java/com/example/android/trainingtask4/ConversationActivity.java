@@ -42,7 +42,13 @@ import java.util.Locale;
 @SuppressWarnings("unused")
 public class ConversationActivity extends AppCompatActivity {
 
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_VIDEO_CAPTURE = 2;
+    final static ArrayList<Message> messages = new ArrayList<Message>();
+    private static final int RESULT_VEDIO_CAPTURE = 1;
+    MessageAdapter messageAdapter;
     private AudioManager mAudioManager;
+    private MediaPlayer mMediaPlayer;
     AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
             new AudioManager.OnAudioFocusChangeListener() {
                 @Override
@@ -59,30 +65,32 @@ public class ConversationActivity extends AppCompatActivity {
                     }
                 }
             };
-
     private MediaPlayer.OnCompletionListener mCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
             releaseMediaPlayer();
         }
     };
-    private MediaPlayer mMediaPlayer;
-
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    static final int REQUEST_VIDEO_CAPTURE = 2;
-    private static final int RESULT_VEDIO_CAPTURE = 1;
     private String mCurrentPhotoPath;
     private String mCurrentVideoPath;
-    final ArrayList<Message> messages = new ArrayList<Message>();
-    MessageAdapter messageAdapter ;
 
-    //    ImageView mImageView = new ImageView(this);
-//    //        get LinearLayout
-//    final LinearLayout parentLayout = (LinearLayout) findViewById(R.id.parentLayout);
-//    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-//            LinearLayout.LayoutParams.WRAP_CONTENT);
-//    parentLayout.addView(mImageview,lp);
-//private ImageView mImageView;
+    // formatting time message chat
+    public static String formattingTime(long time) {
+        long now = System.currentTimeMillis();
+        CharSequence ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.FORMAT_SHOW_TIME);
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm aa");
+        String timeString = ago + "  " + format.format(time) + " ";
+        return timeString;
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +107,6 @@ public class ConversationActivity extends AppCompatActivity {
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
 
         //      Camera Button
         final ImageView camBtn = (ImageView) findViewById(R.id.cam_btn);
@@ -119,8 +126,8 @@ public class ConversationActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(editText.getText().toString().equals("") )
-                camBtn.setVisibility(View.VISIBLE);
+                if (editText.getText().toString().equals(""))
+                    camBtn.setVisibility(View.VISIBLE);
             }
         });
 
@@ -137,7 +144,7 @@ public class ConversationActivity extends AppCompatActivity {
                     }
                     Long time = System.currentTimeMillis();
                     String ts = formattingTime(time);
-                    Message message = new Message(text, 0 , R.raw.send_tone);
+                    Message message = new Message(text, 0, R.raw.send_tone);
                     messages.add(message);
                     releaseMediaPlayer();
                     int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
@@ -157,7 +164,6 @@ public class ConversationActivity extends AppCompatActivity {
                 }
             }
         });
-
 
 
         camBtn.setOnClickListener(new View.OnClickListener() {
@@ -234,7 +240,7 @@ public class ConversationActivity extends AppCompatActivity {
         list.setDivider(null);
     }
 
-
+    //Create File which stored locally for the app
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -246,7 +252,6 @@ public class ConversationActivity extends AppCompatActivity {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
@@ -267,6 +272,7 @@ public class ConversationActivity extends AppCompatActivity {
         return video;
     }
 
+    //    here we add the send, done, read buttons on the ActionBar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -278,23 +284,19 @@ public class ConversationActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.done:
-                //add the function to perform here
                 for (Message msg : messages) {
                     if (msg.getMessageStatus() == Message.STATE_WAITING)
                         msg.setMessageStatus(Message.STATE_SEND);
                 }
                 messageAdapter.notifyDataSetChanged();
                 break;
-//                return (true);
             case R.id.done_all:
-                //add the function to perform here
                 for (Message msg : messages) {
                     if (msg.getMessageStatus() == Message.STATE_SEND)
                         msg.setMessageStatus(Message.STATE_READ);
                 }
                 messageAdapter.notifyDataSetChanged();
                 break;
-//                return (true);
             case R.id.copy_msg:
                 if (!messages.isEmpty()) {
                     Message lastMessage = messages.get(messages.size() - 1);
@@ -311,38 +313,36 @@ public class ConversationActivity extends AppCompatActivity {
                     }
                     messageAdapter.notifyDataSetChanged();
                 }
-                //add the function to perform here
-//                return (true);
         }
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
-
+        switch (requestCode) {
+//What to do after we take a photo
             case REQUEST_IMAGE_CAPTURE:
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Long time = System.currentTimeMillis();
-            String ts = formattingTime(time);
-            Message message = new Message(mCurrentPhotoPath, 1, R.raw.send_tone );
-            messages.add(message);
-            releaseMediaPlayer();
-            int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                mMediaPlayer = MediaPlayer.create(ConversationActivity.this, message.getmAudioResourceId());
-                mMediaPlayer.start();
-                mMediaPlayer.setOnCompletionListener(mCompletionListener);
-            }
-            messageAdapter.notifyDataSetChanged();
-        }
+                if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+                    Long time = System.currentTimeMillis();
+                    String ts = formattingTime(time);
+                    Message message = new Message(mCurrentPhotoPath, 1, R.raw.send_tone);
+                    messages.add(message);
+                    releaseMediaPlayer();
+                    int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                        mMediaPlayer = MediaPlayer.create(ConversationActivity.this, message.getmAudioResourceId());
+                        mMediaPlayer.start();
+                        mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                    }
+                    messageAdapter.notifyDataSetChanged();
+                }
 
+                //What to do after we record a video
             case REQUEST_VIDEO_CAPTURE:
                 if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
                     Long time = System.currentTimeMillis();
                     String ts = formattingTime(time);
-                    Message message = new Message(mCurrentVideoPath, 2 , R.raw.send_tone);
+                    Message message = new Message(mCurrentVideoPath, 2, R.raw.send_tone);
                     messages.add(message);
                     releaseMediaPlayer();
                     int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
@@ -357,29 +357,7 @@ public class ConversationActivity extends AppCompatActivity {
         }
     }
 
-
-    // formatting time message chat
-    public static String formattingTime(long time) {
-        long now = System.currentTimeMillis();
-        CharSequence ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.FORMAT_SHOW_TIME);
-        SimpleDateFormat format = new SimpleDateFormat("hh:mm aa");
-        String timeString = ago + "  " + format.format(time) + " ";
-        return timeString;
-    }
-
-
-    public static void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager =
-                (InputMethodManager) activity.getSystemService(
-                        Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(
-                activity.getCurrentFocus().getWindowToken(), 0);
-    }
-
-
-
     public void setupUI(View view) {
-
         // Set up touch listener for non-text box views to hide keyboard.
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {
